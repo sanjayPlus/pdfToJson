@@ -15,6 +15,16 @@ app.use(express.json());
 
 const upload = multer({ storage: multer.memoryStorage() });
 app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) => {
+    const authToken = req.headers['x-access-token'];
+    if(!authToken) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const payload = jwt.verify(authToken, process.env.JWT_VOLUNTEER_SECRET);
+
+    if(!payload) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+
     // Immediately acknowledge the file upload
     res.status(200).json({ message: "Upload received, processing started." });
 
@@ -46,6 +56,15 @@ app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) =>
 });
 
 app.post('/api/admin-upload-pdf', upload.single('file'), async (req, res) => {
+    const authToken = req.headers['x-access-token'];
+    if(!authToken) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
+    const payload = jwt.verify(authToken, process.env.JWT_ADMIN_SECRET);
+
+    if(!payload) {
+        return res.status(401).json({ message: 'Unauthorized' });
+    }
     // Immediately acknowledge the file upload
     res.status(200).json({ message: "Upload received, processing started." });
 
