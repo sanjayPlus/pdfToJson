@@ -16,7 +16,7 @@ app.use(express.json());
 const upload = multer({ storage: multer.memoryStorage() });
 app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) => {
     // Immediately acknowledge the file upload
-    res.status(202).json({ message: "Upload received, processing started." });
+    res.status(200).json({ message: "Upload received, processing started." });
 
     try {
         const fileBuffer = req.file.buffer;
@@ -47,7 +47,7 @@ app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) =>
 
 app.post('/api/admin-upload-pdf', upload.single('file'), async (req, res) => {
     // Immediately acknowledge the file upload
-    res.status(202).json({ message: "Upload received, processing started." });
+    res.status(200).json({ message: "Upload received, processing started." });
 
     try {
         const fileBuffer = req.file.buffer;
