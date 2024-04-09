@@ -5,8 +5,10 @@ const app = express();
 const multer = require('multer');
 const { pdftoJson } = require('./pdfToJson');
 const axios = require('axios');
+const cors = require('cors');
 const jwtSecret = process.env.VOLUNTEER_SERVER_SECRET;
 
+app.use(cors());
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
