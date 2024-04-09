@@ -24,7 +24,6 @@ app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) =>
         const result = await pdftoJson(fileBuffer);
         const resp = await axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/volunteer/volunteer-upload-pdf`, {
             data: result,
-            token: jwt.sign({ data: result }, jwtSecret),
             booth
         }, {
             headers: {
@@ -48,9 +47,8 @@ app.post('/api/admin-upload-pdf', upload.single('file'), async (req, res) => {
         const token = req.headers['x-access-token'];
         console.log(fileBuffer);
         const result = await pdftoJson(fileBuffer);
-        axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/admin/admin-upload-pdf`, {
+        await axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/admin/admin-upload-pdf`, {
             data: result,
-            token: jwt.sign({ data: result }, jwtSecret),
             booth,
             district,
             constituency,
