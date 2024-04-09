@@ -19,16 +19,17 @@ app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) =>
     try {
         const fileBuffer = req.file.buffer;
         const volunteerToken = req.body.volunteerToken;
+        const token = req.headers['x-access-token'];
         const {booth} = req.body;
         const result = await pdftoJson(fileBuffer);
-        const resp = await axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/volunteer/add-json-data`, {
+        const resp = await axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/volunteer/volunteer-upload-pdf`, {
             data: result,
             token: jwt.sign({ data: result }, jwtSecret),
             booth
         }, {
             headers: {
                 'Content-Type': 'application/json',
-                'x-access-token': volunteerToken
+                'x-access-token': token
             }
         })
 
@@ -43,17 +44,21 @@ app.post('/api/admin-upload-pdf', upload.single('file'), async (req, res) => {
     try {
         const fileBuffer = req.file.buffer;
         const adminToken = req.body.adminToken;
-        const {booth,district,constituency} = req.body;
+        const {booth,district,constituency,assembly} = req.body;
+        const token = req.headers['x-access-token'];
         console.log(fileBuffer);
         const result = await pdftoJson(fileBuffer);
-        axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/admin/add-json-data`, {
+        axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/admin/admin-upload-pdf`, {
             data: result,
             token: jwt.sign({ data: result }, jwtSecret),
-
+            booth,
+            district,
+            constituency,
+            assembly
         }, {
             headers: {
                 'Content-Type': 'application/json',
-                'x-access-token': adminToken
+                'x-access-token': token
             }
         })
 
