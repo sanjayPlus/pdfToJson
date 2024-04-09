@@ -40,29 +40,59 @@ if (!fs.existsSync(outputDirectory)) {
 //         console.log(error);
 //     }
 // }
+// const convertPDFToImages = async (pdf) => {
+//     try {
+
+//         const pdfResult = await pdfCountCalc(pdf);
+//         const pdfTotalPageNo = pdfResult.numpages;
+//         let compiledTextArray = []; // Initialize an array to compile all text
+//         for (let index = 3; index < pdfTotalPageNo-1; index++) {
+//             const images = await pdf2img.convert(pdf, {
+//                 width: 2480,
+//                 height: 3509,
+//                 page_numbers: [index]
+//             });
+//             let round = index - 3;
+//             for (let i = 0; i < images.length; i++) {
+//                 const textArray = await cropImage(images[i], round); // Wait for each image to be processed
+//                 compiledTextArray = [...compiledTextArray, ...textArray];
+//             }
+//         }
+//         return compiledTextArray;
+//     } catch (error) {
+
+//         console.error("Error in convertPDFToImages:", error);
+        
+//     }
+// };
 const convertPDFToImages = async (pdf) => {
     try {
-
         const pdfResult = await pdfCountCalc(pdf);
         const pdfTotalPageNo = pdfResult.numpages;
         let compiledTextArray = []; // Initialize an array to compile all text
-        for (let index = 3; index < pdfTotalPageNo-1; index++) {
+
+        for (let index = 3; index < pdfTotalPageNo - 1; index++) {
             const images = await pdf2img.convert(pdf, {
                 width: 2480,
                 height: 3509,
                 page_numbers: [index]
             });
             let round = index - 3;
-            for (let i = 0; i < images.length; i++) {
-                const textArray = await cropImage(images[i], round); // Wait for each image to be processed
-                compiledTextArray = [...compiledTextArray, ...textArray];
-            }
+
+            // Use Promise.all to process all images in parallel for the current page
+            const pageTextPromises = images.map((image) => cropImage(image, round));
+            const pageTextArrays = await Promise.all(pageTextPromises);
+
+            // Flatten the array of arrays into a single array and merge with compiledTextArray
+            compiledTextArray = compiledTextArray.concat(...pageTextArrays);
         }
+
         return compiledTextArray;
     } catch (error) {
         console.error("Error in convertPDFToImages:", error);
     }
 };
+
 const cropImage = async (image, something) => {
     try {
         console.log(something);
@@ -182,10 +212,18 @@ const makeOCRDataVoterId = async (filePath) => {
         await worker.terminate(); // Make sure to terminate the worker
     }
 };
-const pdftoJson = async (pdf) => {
-    const finalArray = await convertPDFToImages(pdf);
-    return finalArray
-}
+const pdftoJson = (pdf) => {
+    return new Promise((resolve, reject) => {
+        convertPDFToImages(pdf)
+            .then(finalArray => {
+                resolve(finalArray);
+            })
+            .catch(error => {
+                reject(error);
+            });
+    });
+};
+
 module.exports = {
     pdftoJson
 }

@@ -14,59 +14,70 @@ app.use(express.json());
 //create buffer from req file data
 
 const upload = multer({ storage: multer.memoryStorage() });
-
 app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) => {
+    // Immediately acknowledge the file upload
+    res.status(202).json({ message: "Upload received, processing started." });
+
     try {
         const fileBuffer = req.file.buffer;
-        const volunteerToken = req.body.volunteerToken;
         const token = req.headers['x-access-token'];
-        const {booth} = req.body;
-        const result = await pdftoJson(fileBuffer);
-        const resp = await axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/volunteer/volunteer-upload-pdf`, {
-            data: result,
-            booth
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'x-access-token': token
-            }
-        })
+        const { booth } = req.body;
 
-        res.status(200).json({message:"Added Successfully"});
+        // Process PDF to JSON in the background
+        pdftoJson(fileBuffer).then(result => {
+            return axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/volunteer/volunteer-upload-pdf`, {
+                data: result,
+                booth
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            });
+        }).then(() => {
+            console.log('Processing and upload successful');
+        }).catch(error => {
+            console.error('Error during processing or upload', error);
+        });
+
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'An error occurred while processing the PDF file.' });
+        console.error('An error occurred:', error);
     }
+});
 
-})
 app.post('/api/admin-upload-pdf', upload.single('file'), async (req, res) => {
+    // Immediately acknowledge the file upload
+    res.status(202).json({ message: "Upload received, processing started." });
+
     try {
         const fileBuffer = req.file.buffer;
-        const adminToken = req.body.adminToken;
-        const {booth,district,constituency,assembly} = req.body;
         const token = req.headers['x-access-token'];
-        console.log(fileBuffer);
-        const result = await pdftoJson(fileBuffer);
-        await axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/admin/admin-upload-pdf`, {
-            data: result,
-            booth,
-            district,
-            constituency,
-            assembly
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'x-access-token': token
-            }
-        })
+        const { booth, district, constituency, assembly } = req.body;
 
-        res.status(200).json({message:"Added Successfully"});
+        // Process PDF to JSON in the background
+        pdftoJson(fileBuffer).then(result => {
+            return axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/admin/admin-upload-pdf`, {
+                data: result,
+                booth,
+                district,
+                constituency,
+                assembly
+            }, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-token': token
+                }
+            });
+        }).then(() => {
+            console.log('Processing and upload successful');
+        }).catch(error => {
+            console.error('Error during processing or upload', error);
+        });
+
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: 'An error occurred while processing the PDF file.' });
+        console.error('An error occurred:', error);
     }
-
-})
+});
 
 app.listen(process.env.PORT || 3000, () => {
     console.log('Server started on port ' + process.env.PORT || 3000);
