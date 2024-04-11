@@ -65,14 +65,13 @@ if (!fs.existsSync(outputDirectory)) {
         
 //     }
 // };
-let numberSNo = 1;
 const convertPDFToImages = async (pdf) => {
     try {
         const pdfResult = await pdfCountCalc(pdf);
         const pdfTotalPageNo = pdfResult.numpages;
         let compiledTextArray = []; // Initialize an array to compile all text
 
-        for (let index = 3; index < pdfTotalPageNo - 1; index++) {
+        for (let index = 29; index < pdfTotalPageNo - 1; index++) {
             const images = await pdf2img.convert(pdf, {
                 width: 2480,
                 height: 3509,
@@ -166,16 +165,15 @@ const cropImage = async (image, something) => {
             }
         
             // Calculate the serial number, adjusting for any previous null entries
-        //     let sNo = ((index + 1) + round)
-        //   sNo = sNo - nullCount;
-        numberSNo++;
-            let sNo = numberSNo 
+            const sNo = index + 1 + round - nullCount;
+            
             // Construct the data object for this entry
             const dataObj = {
                 sNo,
                 ...text,
                 voterId: voterIdArray[index],
             };
+            nullCount = 0;
             // Do not reset nullCount here; it's used continuously to adjust sNo
             return dataObj;
         }).filter(entry => entry !== undefined); // Filter out the skipped (undefined) entries
