@@ -62,9 +62,10 @@ if (!fs.existsSync(outputDirectory)) {
 //     } catch (error) {
 
 //         console.error("Error in convertPDFToImages:", error);
-        
+
 //     }
 // };
+let numberSNo = 0;
 const convertPDFToImages = async (pdf) => {
     try {
         const pdfResult = await pdfCountCalc(pdf);
@@ -110,10 +111,10 @@ const cropImage = async (image, something) => {
             const text = await makeOCRDataMal(croppedImageBuffer); // Pass the buffer directly to the OCR function
             const engtext = await makeOCRDataEng(croppedImageBuffer); // Pass the buffer directly to the OCR function
             if (!text) {
-                return 
+                return
             }
             if (!engtext) {
-                return 
+                return
             }
             const name = getName(text) ? getName(text) : "";
             const guardianName = getGuardianName(text) ? getGuardianName(text) : "";
@@ -163,21 +164,22 @@ const cropImage = async (image, something) => {
                 nullCount++; // Increment nullCount for each null entry
                 return undefined; // Skip this entry
             }
-        
+
             // Calculate the serial number, adjusting for any previous null entries
-            const sNo = index + 1 + round - nullCount;
-            
+            //     let sNo = ((index + 1) + round)
+            //   sNo = sNo - nullCount;
+            numberSNo++;
+            let sNo = numberSNo
             // Construct the data object for this entry
             const dataObj = {
                 sNo,
                 ...text,
                 voterId: voterIdArray[index],
             };
-            nullCount = 0;
             // Do not reset nullCount here; it's used continuously to adjust sNo
             return dataObj;
         }).filter(entry => entry !== undefined); // Filter out the skipped (undefined) entries
-        
+
         return combinedArray;
 
     } catch (error) {
