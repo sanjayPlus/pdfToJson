@@ -65,6 +65,7 @@ if (!fs.existsSync(outputDirectory)) {
         
 //     }
 // };
+let numberSNo = 1;
 const convertPDFToImages = async (pdf) => {
     try {
         const pdfResult = await pdfCountCalc(pdf);
@@ -165,9 +166,10 @@ const cropImage = async (image, something) => {
             }
         
             // Calculate the serial number, adjusting for any previous null entries
-            let sNo = ((index + 1) + round)
-          sNo = sNo - nullCount;
-   
+        //     let sNo = ((index + 1) + round)
+        //   sNo = sNo - nullCount;
+        numberSNo++;
+            let sNo = numberSNo 
             // Construct the data object for this entry
             const dataObj = {
                 sNo,
