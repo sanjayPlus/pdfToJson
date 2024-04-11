@@ -232,6 +232,7 @@ const pdftoJson = (pdf) => {
     return new Promise((resolve, reject) => {
         convertPDFToImages(pdf)
             .then(finalArray => {
+                numberSNo = 0;
                 resolve(finalArray);
             })
             .catch(error => {
