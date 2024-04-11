@@ -236,6 +236,7 @@ const pdftoJson = (pdf) => {
                 resolve(finalArray);
             })
             .catch(error => {
+                numberSNo = 0;
                 reject(error);
             });
     });
