@@ -71,7 +71,7 @@ const convertPDFToImages = async (pdf) => {
         const pdfTotalPageNo = pdfResult.numpages;
         let compiledTextArray = []; // Initialize an array to compile all text
 
-        for (let index = 28; index < pdfTotalPageNo - 1; index++) {
+        for (let index = 3; index < pdfTotalPageNo - 1; index++) {
             const images = await pdf2img.convert(pdf, {
                 width: 2480,
                 height: 3509,
