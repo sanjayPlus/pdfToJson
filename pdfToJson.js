@@ -62,9 +62,10 @@ if (!fs.existsSync(outputDirectory)) {
 //     } catch (error) {
 
 //         console.error("Error in convertPDFToImages:", error);
-        
+
 //     }
 // };
+let numberSNo = 1;
 const convertPDFToImages = async (pdf) => {
     try {
         const pdfResult = await pdfCountCalc(pdf);
@@ -110,10 +111,10 @@ const cropImage = async (image, something) => {
             const text = await makeOCRDataMal(croppedImageBuffer); // Pass the buffer directly to the OCR function
             const engtext = await makeOCRDataEng(croppedImageBuffer); // Pass the buffer directly to the OCR function
             if (!text) {
-                return 
+                return
             }
             if (!engtext) {
-                return 
+                return
             }
             const name = getName(text) ? getName(text) : "";
             const guardianName = getGuardianName(text) ? getGuardianName(text) : "";
@@ -155,15 +156,30 @@ const cropImage = async (image, something) => {
         const voterIdArray = VoterId.filter(text => text !== ""); // Remove empty strings from array
         // Remove empty strings from array
         //combain text and voterId
+        let nullCount = 0;
         const combinedArray = textArray.map((text, index) => {
-            //one round = 30 data 
+            // One round = 30 data
             let round = something * 30;
-            return {
-                sNo: index + 1 + round,
+            if (!text) {
+                nullCount++; // Increment nullCount for each null entry
+                return undefined; // Skip this entry
+            }
+
+            // Calculate the serial number, adjusting for any previous null entries
+            //     let sNo = ((index + 1) + round)
+            //   sNo = sNo - nullCount;
+            numberSNo++;
+            let sNo = numberSNo
+            // Construct the data object for this entry
+            const dataObj = {
+                sNo,
                 ...text,
                 voterId: voterIdArray[index],
             };
-        })
+            // Do not reset nullCount here; it's used continuously to adjust sNo
+            return dataObj;
+        }).filter(entry => entry !== undefined); // Filter out the skipped (undefined) entries
+
         return combinedArray;
 
     } catch (error) {
