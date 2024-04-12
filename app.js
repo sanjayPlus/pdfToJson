@@ -29,7 +29,7 @@ app.post('/api/admin-upload-pdf', upload.single('file'), async (req, res) => {
         metadata: req.body // This includes any additional data like booth, district, etc.
     });
 
-    res.status(202).json({ message: "Upload received, queued for processing." });
+    res.status(200).json({ message: "Upload received, queued for processing." });
 
     // Start processing if not already doing so
     if (!isProcessing) {
@@ -49,7 +49,7 @@ app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) =>
         metadata: req.body // This includes any additional data like booth, district, etc.
     });
 
-    res.status(202).json({ message: "Upload received, queued for processing." });
+    res.status(200).json({ message: "Upload received, queued for processing." });
 
     // Start processing if not already doing so
     if (!isProcessing) {
