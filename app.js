@@ -70,7 +70,7 @@ async function processQueue() {
 
     try {
         const result = await pdftoJson(buffer);
-        await axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api/${endpoint}`, {
+        await axios.post(`${process.env.VOLUNTEER_SERVER_URL}/api${endpoint}`, {
             data: result,
             ...metadata
         }, {
