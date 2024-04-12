@@ -26,14 +26,15 @@ app.post('/api/admin-upload-pdf', upload.single('file'), async (req, res) => {
     queue.push({
         buffer: req.file.buffer,
         token: authToken,
-        metadata: req.body // This includes any additional data like booth, district, etc.
+        metadata: req.body, // This includes any additional data like booth, district, etc.,
+        endpoint: '/admin/admin-upload-pdf'
     });
 
     res.status(200).json({ message: "Upload received, queued for processing." });
 
     // Start processing if not already doing so
     if (!isProcessing) {
-        processQueue('/admin/admin-upload-pdf');
+        processQueue();
     }
 });
 app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) => {
@@ -46,25 +47,26 @@ app.post('/api/volunteer-upload-pdf', upload.single('file'), async (req, res) =>
     queue.push({
         buffer: req.file.buffer,
         token: authToken,
-        metadata: req.body // This includes any additional data like booth, district, etc.
+        metadata: req.body, // This includes any additional data like booth, district, etc.
+        endpoint: '/volunteer/volunteer-upload-pdf'
     });
 
     res.status(200).json({ message: "Upload received, queued for processing." });
 
     // Start processing if not already doing so
     if (!isProcessing) {
-        processQueue('/volunteer/volunteer-upload-pdf');
+        processQueue();
     }
 });
 
-async function processQueue(endpoint) {
+async function processQueue() {
     if (queue.length === 0) {
         isProcessing = false;
         return;
     }
 
     isProcessing = true;
-    const { buffer, token, metadata } = queue.shift();
+    const { buffer, token, metadata, endpoint } = queue.shift();
 
     try {
         const result = await pdftoJson(buffer);
@@ -83,7 +85,7 @@ async function processQueue(endpoint) {
         console.error('Error during processing or upload', error);
     } finally {
         // Optionally clear cache or temp data here
-        processQueue(endpoint); // Process the next item in the queue
+        processQueue(); // Process the next item in the queue
     }
 }
 app.listen(process.env.PORT || 3000, () => {
