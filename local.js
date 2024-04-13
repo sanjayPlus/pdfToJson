@@ -124,12 +124,12 @@ const cropImage = async (image, something) => {
             const age = getAge(engtext) ? getAge(engtext) : "";
 
             return {
-                name: name ? ml2en(name) : "",
-                guardianName: guardianName ? ml2en(guardianName) : "",
-                gender: gender ? ml2en(gender) : "N",
-                houseName: houseName ? ml2en(houseName) : "",
-                houseNo: houseNo ? ml2en(houseNo) : "",
-                age: age ? ml2en(age) : ""
+                name: name ? name: "",
+                guardianName: guardianName ? guardianName : "",
+                gender: gender ? gender: "N",
+                houseName: houseName ? houseName: "",
+                houseNo: houseNo ? houseNo: "",
+                age: age ? age: ""
             }
         }));
         // Use Promise.all to wait for all cropping and OCR operations to complete
